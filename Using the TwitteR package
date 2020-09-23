@@ -1,0 +1,48 @@
+#Scrip para capturar tweets da rede social Twitter
+
+#Instalar e carregar pacotes abaixo
+
+install.packages("tidyverse")
+library(tidyverse)
+install.packages("twitteR")
+library(twitteR)
+
+#Por favor, usar as keys próprias fornecidas para a sua conta do Twitter
+
+consumer_key<-"kB08foOYD9jX4vxJsGatjo9rT"
+consumer_secret<-"nC84tG7NjQy44jgRn9s13ZMrxlhwR6QYfZBCIKZzOyf8M3UMrN"
+access_token<-"1307777072245420035-nxjCHO1nHYHapTDVvjCB8Ibb3RRVXI"
+access_secret<- "or0iSEfEKen2kI8qJV2XvC99ZEu8wr8P3mCBJifft9pIc"
+
+#Com a função setup_twitter_oauth conseguimos conectar o R ao Twitter
+  
+?setup_twitter_oauth
+
+setup_twitter_oauth(consumer_key,consumer_secret,access_token,access_secret)
+
+#A função availableTrendsLocations busca um código de localização das principais cidades do mundo
+availableTrendLocations()
+
+#A função getTrends busca os principais assuntos do momento em uma determinada cidade com o código obtido pela função availableTrendsLocations
+?getTrends
+
+#Tendências da cidade de São Paulo
+getTrends("455827")
+
+#A função searchTwitter busca palavras específicas determinadas pela programadora
+
+?searchTwitteR
+
+#Procurando tweets com a palavra "pantanal"
+
+pantanal2 = searchTwitteR("pantanal",n=100,lang="pt")
+
+pantanal2 = pantanal2 %>% twListToDF
+
+#Empilhando os data frames para uma base final 
+
+pantanal_base<-rbind.data.frame(pantanal,pantanal2) 
+
+#Baixando a base em Excel
+
+write.csv(pantanal_base,"base_final_pantanal.csv")
