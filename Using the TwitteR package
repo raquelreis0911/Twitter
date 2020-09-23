@@ -2,10 +2,39 @@
 
 #Instalar e carregar pacotes abaixo
 
+install.packages("dplyr")
+
 install.packages("tidyverse")
-library(tidyverse)
+
 install.packages("twitteR")
+
+install.packages("wordcloud")
+
+install.packages("RColorBrewer")
+
+install.packages("tidytext")
+
+install.packages("stringr")
+
+install.packages("tm")
+
+install.packages("slam")
+
+install.packages("SnowballC")
+
+
+#Carregando os pacotes
+
+library(dplyr)
+library(tidyverse)
 library(twitteR)
+library(wordcloud)
+library(RColorBrewer)
+library(tidytext)
+library(stringr)
+library(tm)
+library(slam)
+library(SnowballC)
 
 #Por favor, usar as keys próprias fornecidas para a sua conta do Twitter
 
@@ -33,11 +62,11 @@ getTrends("455827")
 
 ?searchTwitteR
 
-#Procurando tweets com a palavra "pantanal"
+#Procurando tweets com a palavra "pantanal" em português (BR)
 
-pantanal2 = searchTwitteR("pantanal",n=100,lang="pt")
+pantanal = searchTwitteR("pantanal",n=100,lang="pt")
 
-pantanal2 = pantanal2 %>% twListToDF
+pantanal = pantanal %>% twListToDF
 
 #Empilhando os data frames para uma base final 
 
@@ -46,3 +75,29 @@ pantanal_base<-rbind.data.frame(pantanal,pantanal2)
 #Baixando a base em Excel
 
 write.csv(pantanal_base,"base_final_pantanal.csv")
+
+#Nuvem de palavras: análise de corpus textual
+
+#1º passo: limpeza de texto
+subs = "https://t.co/[A-Za-z\\d]+|http://[A-Za-z\\d]+|&amp;|&lt;|&gt;|RT|https"
+
+pantanal_tokens<-pantanal %>% mutate(text=str_replace_all(text, subs,"")) %>%
+  unnest_tokens(palavras,text)
+
+#2º passo: retirando palavras desnecessárias no Excel
+
+write_csv(pantanal_tokens,"pantanal_tokens.csv")
+
+#3º passo: criando a nuvem
+
+#Primeiro, faço o upload da base de palavras tratadas
+
+pantanalcorpus <- Corpus(VectorSource(palavras_pantanal))
+
+pantanalcorpus <- tm_map(pantanalcorpus, PlainTextDocument)
+
+pantanalcorpus <- tm_map(pantanalcorpus, stemDocument)
+
+wordcloud(pantanalcorpus,max.words=250,colors=c("blue","red"))
+
+pantanalcorpus <- tm_map(pantanalcorpus, removePunctuation) 
